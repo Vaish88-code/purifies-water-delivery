@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Logo } from "@/components/Logo";
@@ -29,6 +30,41 @@ import {
   ChevronDown
 } from "lucide-react";
 
+const fadeInUp = {
+  hidden: { opacity: 0, y: 40 },
+  visible: { opacity: 1, y: 0 }
+};
+
+const fadeIn = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const scaleIn = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: { opacity: 1, scale: 1 }
+};
+
+const slideInLeft = {
+  hidden: { opacity: 0, x: -60 },
+  visible: { opacity: 1, x: 0 }
+};
+
+const slideInRight = {
+  hidden: { opacity: 0, x: 60 },
+  visible: { opacity: 1, x: 0 }
+};
+
 const LandingPage = () => {
   const scrollToSection = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
@@ -37,7 +73,12 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
+      <motion.nav 
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border"
+      >
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Logo size="sm" />
           <div className="hidden md:flex items-center gap-8">
@@ -55,32 +96,67 @@ const LandingPage = () => {
             </Link>
           </div>
         </div>
-      </nav>
+      </motion.nav>
 
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 md:pt-40 md:pb-32 overflow-hidden">
         {/* Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
-          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-secondary/10 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-br from-primary/5 to-secondary/5 rounded-full blur-3xl" />
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.2 }}
+            className="absolute -top-40 -right-40 w-96 h-96 bg-primary/10 rounded-full blur-3xl" 
+          />
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.2, delay: 0.2 }}
+            className="absolute -bottom-40 -left-40 w-96 h-96 bg-secondary/10 rounded-full blur-3xl" 
+          />
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1.5 }}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-br from-primary/5 to-secondary/5 rounded-full blur-3xl" 
+          />
         </div>
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent text-accent-foreground text-sm font-medium mb-6 animate-slide-up">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent text-accent-foreground text-sm font-medium mb-6"
+              >
                 <Droplets className="w-4 h-4" />
                 Trusted by 10,000+ families
-              </div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 animate-slide-up-delay-1">
+              </motion.div>
+              <motion.h1 
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6"
+              >
                 Pure Water.{" "}
                 <span className="water-gradient-text">Delivered to Your Doorstep.</span>
-              </h1>
-              <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl mx-auto lg:mx-0 animate-slide-up-delay-2">
+              </motion.h1>
+              <motion.p 
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl mx-auto lg:mx-0"
+              >
                 Order safe, reliable drinking water from trusted local suppliers — anytime, anywhere.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-slide-up-delay-3">
+              </motion.p>
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
+              >
                 <Link to="/register">
                   <Button size="lg" className="water-gradient text-primary-foreground w-full sm:w-auto text-lg px-8">
                     Get Started
@@ -92,11 +168,16 @@ const LandingPage = () => {
                     Login
                   </Button>
                 </Link>
-              </div>
+              </motion.div>
             </div>
 
             {/* Hero Illustration */}
-            <div className="relative hidden lg:block">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="relative hidden lg:block"
+            >
               <div className="relative w-full aspect-square max-w-lg mx-auto">
                 {/* Water Drop Illustration */}
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -109,7 +190,13 @@ const LandingPage = () => {
                 </div>
                 
                 {/* Floating Elements */}
-                <div className="absolute top-10 right-10 p-4 bg-card rounded-xl shadow-lg animate-float" style={{ animationDelay: '0.5s' }}>
+                <motion.div 
+                  initial={{ opacity: 0, x: 50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: 0.5 }}
+                  className="absolute top-10 right-10 p-4 bg-card rounded-xl shadow-lg animate-float" 
+                  style={{ animationDelay: '0.5s' }}
+                >
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full water-gradient flex items-center justify-center">
                       <Truck className="w-5 h-5 text-primary-foreground" />
@@ -119,9 +206,15 @@ const LandingPage = () => {
                       <p className="text-xs text-muted-foreground">Same day service</p>
                     </div>
                   </div>
-                </div>
+                </motion.div>
 
-                <div className="absolute bottom-20 left-0 p-4 bg-card rounded-xl shadow-lg animate-float" style={{ animationDelay: '1s' }}>
+                <motion.div 
+                  initial={{ opacity: 0, x: -50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: 0.7 }}
+                  className="absolute bottom-20 left-0 p-4 bg-card rounded-xl shadow-lg animate-float" 
+                  style={{ animationDelay: '1s' }}
+                >
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
                       <ShieldCheck className="w-5 h-5 text-secondary-foreground" />
@@ -131,13 +224,18 @@ const LandingPage = () => {
                       <p className="text-xs text-muted-foreground">Verified suppliers</p>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* Scroll Indicator */}
-          <div className="flex justify-center mt-16">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 1 }}
+            className="flex justify-center mt-16"
+          >
             <button 
               onClick={() => scrollToSection('what-is-purifies')}
               className="flex flex-col items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
@@ -145,103 +243,155 @@ const LandingPage = () => {
               <span className="text-sm">Learn More</span>
               <ChevronDown className="w-5 h-5 animate-bounce" />
             </button>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* What is Purifies Section */}
       <section id="what-is-purifies" className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={fadeInUp}
+            transition={{ duration: 0.6 }}
+            className="text-center max-w-3xl mx-auto mb-16"
+          >
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               What is <span className="water-gradient-text">Purifies</span>?
             </h2>
             <p className="text-lg text-muted-foreground">
               Purifies is an online web platform that connects customers with verified local water suppliers for fast, reliable water jar delivery.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            variants={staggerContainer}
+            className="grid grid-cols-2 md:grid-cols-4 gap-6"
+          >
             {[
               { icon: Home, label: "Homes", desc: "Daily household needs" },
               { icon: Building2, label: "Offices", desc: "Corporate hydration" },
               { icon: Store, label: "Shops", desc: "Retail businesses" },
               { icon: Users, label: "Small Businesses", desc: "Startups & more" },
             ].map((item, index) => (
-              <Card key={index} className="text-center p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-border/50">
-                <CardContent className="p-0">
-                  <div className="w-16 h-16 rounded-2xl water-gradient flex items-center justify-center mx-auto mb-4">
-                    <item.icon className="w-8 h-8 text-primary-foreground" />
-                  </div>
-                  <h3 className="font-semibold mb-1">{item.label}</h3>
-                  <p className="text-sm text-muted-foreground">{item.desc}</p>
-                </CardContent>
-              </Card>
+              <motion.div key={index} variants={scaleIn} transition={{ duration: 0.5 }}>
+                <Card className="text-center p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-border/50">
+                  <CardContent className="p-0">
+                    <div className="w-16 h-16 rounded-2xl water-gradient flex items-center justify-center mx-auto mb-4">
+                      <item.icon className="w-8 h-8 text-primary-foreground" />
+                    </div>
+                    <h3 className="font-semibold mb-1">{item.label}</h3>
+                    <p className="text-sm text-muted-foreground">{item.desc}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Why Purifies Section (Problem vs Solution) */}
       <section className="py-20">
         <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={fadeInUp}
+            transition={{ duration: 0.6 }}
+            className="text-center max-w-3xl mx-auto mb-16"
+          >
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Why <span className="water-gradient-text">Purifies</span>?
             </h2>
             <p className="text-lg text-muted-foreground">
               Say goodbye to the old hassles of water delivery
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {/* Problems */}
-            <Card className="p-8 bg-destructive/5 border-destructive/20">
-              <h3 className="text-xl font-bold text-destructive mb-6 flex items-center gap-2">
-                <X className="w-6 h-6" />
-                The Old Way
-              </h3>
-              <ul className="space-y-4">
-                {[
-                  "Calling vendors again and again",
-                  "Uncertain delivery times",
-                  "No fixed pricing",
-                  "No subscription facility",
-                  "Language barriers",
-                ].map((problem, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-destructive/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <X className="w-4 h-4 text-destructive" />
-                    </div>
-                    <span className="text-muted-foreground">{problem}</span>
-                  </li>
-                ))}
-              </ul>
-            </Card>
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+              variants={slideInLeft}
+              transition={{ duration: 0.6 }}
+            >
+              <Card className="p-8 bg-destructive/5 border-destructive/20 h-full">
+                <h3 className="text-xl font-bold text-destructive mb-6 flex items-center gap-2">
+                  <X className="w-6 h-6" />
+                  The Old Way
+                </h3>
+                <ul className="space-y-4">
+                  {[
+                    "Calling vendors again and again",
+                    "Uncertain delivery times",
+                    "No fixed pricing",
+                    "No subscription facility",
+                    "Language barriers",
+                  ].map((problem, index) => (
+                    <motion.li 
+                      key={index} 
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.4, delay: index * 0.1 }}
+                      className="flex items-start gap-3"
+                    >
+                      <div className="w-6 h-6 rounded-full bg-destructive/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <X className="w-4 h-4 text-destructive" />
+                      </div>
+                      <span className="text-muted-foreground">{problem}</span>
+                    </motion.li>
+                  ))}
+                </ul>
+              </Card>
+            </motion.div>
 
             {/* Solutions */}
-            <Card className="p-8 bg-secondary/5 border-secondary/20">
-              <h3 className="text-xl font-bold text-secondary mb-6 flex items-center gap-2">
-                <Check className="w-6 h-6" />
-                The Purifies Way
-              </h3>
-              <ul className="space-y-4">
-                {[
-                  "Easy online ordering",
-                  "Fixed transparent pricing",
-                  "Scheduled & subscription delivery",
-                  "Trusted verified suppliers",
-                  "Multi-language support",
-                ].map((solution, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-secondary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Check className="w-4 h-4 text-secondary" />
-                    </div>
-                    <span className="text-foreground font-medium">{solution}</span>
-                  </li>
-                ))}
-              </ul>
-            </Card>
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+              variants={slideInRight}
+              transition={{ duration: 0.6 }}
+            >
+              <Card className="p-8 bg-secondary/5 border-secondary/20 h-full">
+                <h3 className="text-xl font-bold text-secondary mb-6 flex items-center gap-2">
+                  <Check className="w-6 h-6" />
+                  The Purifies Way
+                </h3>
+                <ul className="space-y-4">
+                  {[
+                    "Easy online ordering",
+                    "Fixed transparent pricing",
+                    "Scheduled & subscription delivery",
+                    "Trusted verified suppliers",
+                    "Multi-language support",
+                  ].map((solution, index) => (
+                    <motion.li 
+                      key={index}
+                      initial={{ opacity: 0, x: 20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.4, delay: index * 0.1 }}
+                      className="flex items-start gap-3"
+                    >
+                      <div className="w-6 h-6 rounded-full bg-secondary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <Check className="w-4 h-4 text-secondary" />
+                      </div>
+                      <span className="text-foreground font-medium">{solution}</span>
+                    </motion.li>
+                  ))}
+                </ul>
+              </Card>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -249,55 +399,90 @@ const LandingPage = () => {
       {/* How It Works Section */}
       <section id="how-it-works" className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={fadeInUp}
+            transition={{ duration: 0.6 }}
+            className="text-center max-w-3xl mx-auto mb-16"
+          >
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               How It <span className="water-gradient-text">Works</span>
             </h2>
             <p className="text-lg text-muted-foreground">
               Get pure water delivered in 4 simple steps
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid md:grid-cols-4 gap-8 max-w-5xl mx-auto">
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            variants={staggerContainer}
+            className="grid md:grid-cols-4 gap-8 max-w-5xl mx-auto"
+          >
             {[
               { icon: Phone, step: "01", title: "Register", desc: "Sign up using your phone number" },
               { icon: Package, step: "02", title: "Choose", desc: "Select water jar type & quantity" },
               { icon: Calendar, step: "03", title: "Schedule", desc: "Pick delivery or subscription" },
               { icon: Truck, step: "04", title: "Receive", desc: "Get water delivered to your doorstep" },
             ].map((item, index) => (
-              <div key={index} className="relative text-center">
+              <motion.div 
+                key={index} 
+                variants={fadeInUp}
+                transition={{ duration: 0.5 }}
+                className="relative text-center"
+              >
                 {/* Connector Line */}
                 {index < 3 && (
                   <div className="hidden md:block absolute top-12 left-1/2 w-full h-0.5 bg-gradient-to-r from-primary/30 to-primary/10" />
                 )}
                 
                 <div className="relative z-10">
-                  <div className="w-24 h-24 rounded-3xl water-gradient flex items-center justify-center mx-auto mb-4 shadow-lg">
+                  <motion.div 
+                    whileHover={{ scale: 1.05, rotate: 5 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                    className="w-24 h-24 rounded-3xl water-gradient flex items-center justify-center mx-auto mb-4 shadow-lg"
+                  >
                     <item.icon className="w-10 h-10 text-primary-foreground" />
-                  </div>
+                  </motion.div>
                   <div className="text-xs font-bold text-primary mb-2">STEP {item.step}</div>
                   <h3 className="text-xl font-bold mb-2">{item.title}</h3>
                   <p className="text-sm text-muted-foreground">{item.desc}</p>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Key Features Section */}
       <section id="features" className="py-20">
         <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={fadeInUp}
+            transition={{ duration: 0.6 }}
+            className="text-center max-w-3xl mx-auto mb-16"
+          >
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Key <span className="water-gradient-text">Features</span>
             </h2>
             <p className="text-lg text-muted-foreground">
               Everything you need for hassle-free water delivery
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            variants={staggerContainer}
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto"
+          >
             {[
               { icon: Truck, title: "Doorstep Delivery", desc: "Get water delivered right to your home or office" },
               { icon: RefreshCw, title: "Subscription Orders", desc: "Set up recurring deliveries and never run out" },
@@ -306,33 +491,52 @@ const LandingPage = () => {
               { icon: MapPin, title: "Order Tracking", desc: "Track your delivery in real-time" },
               { icon: CreditCard, title: "Multiple Payments", desc: "Pay online or cash on delivery" },
             ].map((feature, index) => (
-              <Card key={index} className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group border-border/50">
-                <CardContent className="p-0">
-                  <div className="w-14 h-14 rounded-2xl bg-accent flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <feature.icon className="w-7 h-7 text-primary" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-                  <p className="text-muted-foreground">{feature.desc}</p>
-                </CardContent>
-              </Card>
+              <motion.div key={index} variants={scaleIn} transition={{ duration: 0.5 }}>
+                <Card className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group border-border/50 h-full">
+                  <CardContent className="p-0">
+                    <motion.div 
+                      whileHover={{ scale: 1.1, rotate: -5 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                      className="w-14 h-14 rounded-2xl bg-accent flex items-center justify-center mb-4"
+                    >
+                      <feature.icon className="w-7 h-7 text-primary" />
+                    </motion.div>
+                    <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
+                    <p className="text-muted-foreground">{feature.desc}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Who Can Use Section */}
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={fadeInUp}
+            transition={{ duration: 0.6 }}
+            className="text-center max-w-3xl mx-auto mb-16"
+          >
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Who Can Use <span className="water-gradient-text">Purifies</span>?
             </h2>
             <p className="text-lg text-muted-foreground">
               Perfect for everyone who needs reliable water supply
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 max-w-5xl mx-auto">
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            variants={staggerContainer}
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 max-w-5xl mx-auto"
+          >
             {[
               { icon: Users, label: "Households" },
               { icon: Building2, label: "Offices & Shops" },
@@ -340,32 +544,50 @@ const LandingPage = () => {
               { icon: GraduationCap, label: "Schools & Colleges" },
               { icon: Store, label: "Local Vendors" },
             ].map((item, index) => (
-              <Card key={index} className="p-6 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-border/50">
-                <CardContent className="p-0">
-                  <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center mx-auto mb-4">
-                    <item.icon className="w-8 h-8 text-primary" />
-                  </div>
-                  <h3 className="font-semibold">{item.label}</h3>
-                </CardContent>
-              </Card>
+              <motion.div key={index} variants={scaleIn} transition={{ duration: 0.5 }}>
+                <Card className="p-6 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-border/50">
+                  <CardContent className="p-0">
+                    <motion.div 
+                      whileHover={{ scale: 1.1 }}
+                      className="w-16 h-16 rounded-full bg-accent flex items-center justify-center mx-auto mb-4"
+                    >
+                      <item.icon className="w-8 h-8 text-primary" />
+                    </motion.div>
+                    <h3 className="font-semibold">{item.label}</h3>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Trust Section */}
       <section id="trust" className="py-20">
         <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={fadeInUp}
+            transition={{ duration: 0.6 }}
+            className="text-center max-w-3xl mx-auto mb-16"
+          >
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Why Trust <span className="water-gradient-text">Purifies</span>?
             </h2>
             <p className="text-lg text-muted-foreground">
               Built with your safety and convenience in mind
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-6 max-w-5xl mx-auto">
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            variants={staggerContainer}
+            className="grid md:grid-cols-3 lg:grid-cols-5 gap-6 max-w-5xl mx-auto"
+          >
             {[
               { icon: BadgeCheck, label: "Verified Vendors", color: "bg-primary" },
               { icon: CreditCard, label: "Transparent Pricing", color: "bg-secondary" },
@@ -373,23 +595,47 @@ const LandingPage = () => {
               { icon: ShieldCheck, label: "Secure Login", color: "bg-secondary" },
               { icon: Languages, label: "Local Language", color: "bg-primary" },
             ].map((item, index) => (
-              <div key={index} className="text-center">
-                <div className={`w-20 h-20 rounded-full ${item.color} flex items-center justify-center mx-auto mb-4 shadow-lg`}>
+              <motion.div 
+                key={index} 
+                variants={scaleIn} 
+                transition={{ duration: 0.5 }}
+                className="text-center"
+              >
+                <motion.div 
+                  whileHover={{ scale: 1.1, y: -5 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                  className={`w-20 h-20 rounded-full ${item.color} flex items-center justify-center mx-auto mb-4 shadow-lg`}
+                >
                   <item.icon className="w-10 h-10 text-primary-foreground" />
-                </div>
+                </motion.div>
                 <h3 className="font-semibold">{item.label}</h3>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
           {/* Trust Badges */}
-          <div className="flex flex-wrap justify-center gap-4 mt-12">
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            variants={fadeIn}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="flex flex-wrap justify-center gap-4 mt-12"
+          >
             {["100% Safe Water", "10,000+ Happy Customers", "500+ Verified Vendors", "15+ Cities"].map((badge, index) => (
-              <div key={index} className="px-6 py-3 rounded-full bg-accent text-accent-foreground font-medium">
+              <motion.div 
+                key={index} 
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
+                whileHover={{ scale: 1.05 }}
+                className="px-6 py-3 rounded-full bg-accent text-accent-foreground font-medium"
+              >
                 {badge}
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -398,14 +644,27 @@ const LandingPage = () => {
         <div className="absolute inset-0 water-gradient opacity-90" />
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSIyIi8+PC9nPjwvZz48L3N2Zz4=')] opacity-50" />
         
-        <div className="container mx-auto px-4 relative z-10 text-center">
+        <motion.div 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={fadeInUp}
+          transition={{ duration: 0.6 }}
+          className="container mx-auto px-4 relative z-10 text-center"
+        >
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground mb-6">
             Start Getting Pure Water the Smart Way
           </h2>
           <p className="text-lg text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
             Join thousands of happy customers who trust Purifies for their daily water needs
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center"
+          >
             <Link to="/register">
               <Button size="lg" variant="secondary" className="w-full sm:w-auto text-lg px-8">
                 Register Now
@@ -417,12 +676,19 @@ const LandingPage = () => {
                 Login
               </Button>
             </Link>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* Footer */}
-      <footer className="py-12 bg-card border-t border-border">
+      <motion.footer 
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-50px" }}
+        variants={fadeIn}
+        transition={{ duration: 0.6 }}
+        className="py-12 bg-card border-t border-border"
+      >
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div className="md:col-span-2">
@@ -463,7 +729,7 @@ const LandingPage = () => {
             </p>
           </div>
         </div>
-      </footer>
+      </motion.footer>
     </div>
   );
 };
