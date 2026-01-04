@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Logo } from "@/components/Logo";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { 
   Droplets, 
   Truck, 
@@ -86,8 +87,9 @@ const LandingPage = () => {
             <button onClick={() => scrollToSection('how-it-works')} className="text-sm text-muted-foreground hover:text-foreground transition-colors">How it Works</button>
             <button onClick={() => scrollToSection('trust')} className="text-sm text-muted-foreground hover:text-foreground transition-colors">Why Trust Us</button>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <LanguageSelector />
+            <ThemeToggle />
             <Link to="/login">
               <Button variant="ghost" size="sm">Login</Button>
             </Link>

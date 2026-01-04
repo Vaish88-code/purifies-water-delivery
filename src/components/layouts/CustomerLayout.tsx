@@ -15,6 +15,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/Logo';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth, useTranslation } from '@/contexts/AuthContext';
 import {
   DropdownMenu,
@@ -126,6 +127,7 @@ export function CustomerLayout({ children }: CustomerLayoutProps) {
             </Button>
 
             <LanguageSelector />
+            <ThemeToggle />
 
             {/* Profile Dropdown */}
             <DropdownMenu>

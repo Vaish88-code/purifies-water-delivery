@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/Logo';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth, useTranslation } from '@/contexts/AuthContext';
 import {
   DropdownMenu,
@@ -122,6 +123,7 @@ export function VendorLayout({ children }: VendorLayoutProps) {
           {/* Right Side Actions */}
           <div className="flex items-center gap-2">
             <LanguageSelector />
+            <ThemeToggle />
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
