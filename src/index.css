@@ -121,6 +121,20 @@
     background-clip: text;
   }
 
+  /* Slightly lighter green accent for hero heading */
+  .hero-heading-gradient {
+    background: linear-gradient(
+      135deg,
+      hsl(201 90% 40%) 0%,
+      hsl(192 91% 45%) 35%,
+      hsl(142 71% 60%) 75%,
+      hsl(142 71% 75%) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
   .glass {
     @apply bg-card/80 backdrop-blur-md border border-border/50;
   }
@@ -180,3 +194,4 @@
   animation: slide-up 0.5s ease-out 0.3s forwards;
   opacity: 0;
 }
+

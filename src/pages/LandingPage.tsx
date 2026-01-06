@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -65,7 +66,27 @@ const slideInRight = {
   visible: { opacity: 1, x: 0 }
 };
 
+const heroImages: string[] = [
+  "/hero/images/home.png",
+  "/hero/images/delivery.png.png",
+  "/hero/images/shopwater.png.png",
+  "/hero/images/transport.png",
+  "/hero/images/water.png",
+];
+
 const LandingPage = () => {
+  const [currentHeroImage, setCurrentHeroImage] = useState(0);
+
+  useEffect(() => {
+    if (heroImages.length === 0) return;
+
+    const interval = setInterval(() => {
+      setCurrentHeroImage((prev) => (prev + 1) % heroImages.length);
+    }, 5000); // 5s per slide
+
+    return () => clearInterval(interval);
+  }, []);
+
   const scrollToSection = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -99,27 +120,25 @@ const LandingPage = () => {
       </motion.nav>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 md:pt-40 md:pb-32 overflow-hidden">
-        {/* Background Elements */}
+      <section className="relative pt-32 pb-20 md:pt-40 md:pb-32 overflow-hidden min-h-[70vh]">
+        {/* Background Image Slider */}
         <div className="absolute inset-0 overflow-hidden">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.2 }}
-            className="absolute -top-40 -right-40 w-96 h-96 bg-primary/10 rounded-full blur-3xl" 
-          />
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.2, delay: 0.2 }}
-            className="absolute -bottom-40 -left-40 w-96 h-96 bg-secondary/10 rounded-full blur-3xl" 
-          />
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.5 }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-br from-primary/5 to-secondary/5 rounded-full blur-3xl" 
-          />
+          {heroImages.map((src, index) => (
+            <motion.img
+              key={src}
+              src={src}
+              alt="Purifies water delivery visual"
+              className="absolute inset-0 h-full w-full object-cover"
+              initial={{ opacity: 0, scale: 1.05 }}
+              animate={{
+                opacity: currentHeroImage === index ? 1 : 0,
+                scale: currentHeroImage === index ? 1 : 1.05,
+              }}
+              transition={{ duration: 1.2, ease: "easeInOut" }}
+            />
+          ))}
+          {/* Dark overlay for strong image contrast and text readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/60 to-black/40" />
         </div>
 
         <div className="container mx-auto px-4 relative z-10">
@@ -140,14 +159,15 @@ const LandingPage = () => {
                 transition={{ duration: 0.6, delay: 0.1 }}
                 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6"
               >
-                Pure Water.{" "}
-                <span className="water-gradient-text">Delivered to Your Doorstep.</span>
+                <span className="hero-heading-gradient">
+                  Pure Water Delivered to Your Doorstep.
+                </span>
               </motion.h1>
               <motion.p 
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl mx-auto lg:mx-0"
+                className="text-lg md:text-xl text-primary-foreground/80 mb-8 max-w-xl mx-auto lg:mx-0"
               >
                 Order safe, reliable drinking water from trusted local suppliers — anytime, anywhere.
               </motion.p>
@@ -171,62 +191,8 @@ const LandingPage = () => {
               </motion.div>
             </div>
 
-            {/* Hero Illustration */}
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="relative hidden lg:block"
-            >
-              <div className="relative w-full aspect-square max-w-lg mx-auto">
-                {/* Water Drop Illustration */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="relative">
-                    <div className="w-64 h-80 bg-gradient-to-b from-primary/20 to-secondary/20 rounded-[50%_50%_50%_50%/60%_60%_40%_40%] animate-float" />
-                    <div className="absolute inset-4 bg-gradient-to-b from-primary/30 to-secondary/30 rounded-[50%_50%_50%_50%/60%_60%_40%_40%]" />
-                    <div className="absolute inset-8 bg-gradient-to-b from-primary/40 to-secondary/40 rounded-[50%_50%_50%_50%/60%_60%_40%_40%]" />
-                    <div className="absolute top-12 left-12 w-8 h-8 bg-white/60 rounded-full blur-sm" />
-                  </div>
-                </div>
-                
-                {/* Floating Elements */}
-                <motion.div 
-                  initial={{ opacity: 0, x: 50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.6, delay: 0.5 }}
-                  className="absolute top-10 right-10 p-4 bg-card rounded-xl shadow-lg animate-float" 
-                  style={{ animationDelay: '0.5s' }}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full water-gradient flex items-center justify-center">
-                      <Truck className="w-5 h-5 text-primary-foreground" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold">Fast Delivery</p>
-                      <p className="text-xs text-muted-foreground">Same day service</p>
-                    </div>
-                  </div>
-                </motion.div>
-
-                <motion.div 
-                  initial={{ opacity: 0, x: -50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.6, delay: 0.7 }}
-                  className="absolute bottom-20 left-0 p-4 bg-card rounded-xl shadow-lg animate-float" 
-                  style={{ animationDelay: '1s' }}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
-                      <ShieldCheck className="w-5 h-5 text-secondary-foreground" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold">100% Safe</p>
-                      <p className="text-xs text-muted-foreground">Verified suppliers</p>
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
-            </motion.div>
+            {/* Right side kept empty so imagery can take full background */}
+            <div className="hidden lg:block" />
           </div>
 
           {/* Scroll Indicator */}
