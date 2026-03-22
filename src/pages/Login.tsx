@@ -34,27 +34,40 @@ export default function Login() {
     }
 
     setIsLoading(true);
-    const result = await login(phone, password);
-    setIsLoading(false);
+    try {
+      const result = await login(phone, password);
+      setIsLoading(false);
 
-    if (result.success) {
+      if (result.success) {
+        toast({
+          title: 'Login successful!',
+          description: 'Redirecting to dashboard...',
+        });
+        
+        // Small delay to ensure user state is updated
+        setTimeout(() => {
+          // Role-based navigation
+          const routes: Record<string, string> = {
+            customer: '/customer',
+            vendor: '/vendor',
+            delivery: '/delivery',
+            admin: '/admin',
+          };
+          navigate(routes[result.role] || '/customer');
+        }, 500);
+      } else {
+        toast({
+          title: 'Login failed',
+          description: result.error || 'Invalid phone number or password. Please check your credentials.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error: any) {
+      setIsLoading(false);
+      console.error('Login error:', error);
       toast({
-        title: 'Login successful!',
-        description: 'Redirecting to dashboard...',
-      });
-      
-      // Role-based navigation
-      const routes: Record<string, string> = {
-        customer: '/customer',
-        vendor: '/vendor',
-        delivery: '/delivery',
-        admin: '/admin',
-      };
-      navigate(routes[result.role] || '/customer');
-    } else {
-      toast({
-        title: 'Login failed',
-        description: 'Invalid phone number or password. Try demo123 as password.',
+        title: 'Login error',
+        description: error.message || 'An unexpected error occurred. Please try again.',
         variant: 'destructive',
       });
     }
@@ -157,17 +170,21 @@ export default function Login() {
               </p>
             </form>
 
-            {/* Demo Credentials */}
-            <div className="mt-6 p-4 rounded-lg bg-accent/50 border border-accent">
-              <p className="text-xs font-medium text-accent-foreground mb-2">Demo Credentials:</p>
-              <div className="text-xs text-muted-foreground space-y-1">
-                <p>Customer: 9876543210 / customer123</p>
-                <p>Vendor: 9876543211 / vendor123</p>
-                <p>Delivery: 9876543212 / delivery123</p>
-                <p>Admin: 9876543213 / admin123</p>
-                <p className="text-primary font-medium mt-2">Or use any phone with "demo123"</p>
+            {/* Debug Info - Only in development */}
+            {import.meta.env.MODE === 'development' && (
+              <div className="mt-6 p-4 rounded-lg bg-accent/50 border border-accent text-xs">
+                <p className="font-medium mb-2">🔍 Debug Info:</p>
+                <p className="text-muted-foreground">
+                  • Check browser console (F12) for detailed logs
+                </p>
+                <p className="text-muted-foreground">
+                  • Make sure you've registered an account first
+                </p>
+                <p className="text-muted-foreground">
+                  • Verify Email/Password auth is enabled in Firebase Console
+                </p>
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
       </main>

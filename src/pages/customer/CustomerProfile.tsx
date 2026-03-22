@@ -1,4 +1,4 @@
-import { 
+import {
   User,
   MapPin,
   Phone,
@@ -12,38 +12,54 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { CustomerLayout } from '@/components/layouts/CustomerLayout';
-import { useAuth, useTranslation, translations } from '@/contexts/AuthContext';
+import { useAuth, useTranslation } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-
-const addresses = [
-  {
-    id: 1,
-    label: 'Home',
-    address: '123, Building Name, Street Name, Area, Mumbai - 400001',
-    isDefault: true,
-  },
-  {
-    id: 2,
-    label: 'Office',
-    address: '456, Tech Park, Business District, Mumbai - 400051',
-    isDefault: false,
-  },
-];
-
-const paymentMethods = [
-  { id: 1, type: 'UPI', details: 'user@upi', isDefault: true },
-  { id: 2, type: 'Card', details: '•••• 4242', isDefault: false },
-];
+import { useState } from 'react';
 
 export default function CustomerProfile() {
-  const { user, language, logout } = useAuth();
+  const { user, language, logout, updateProfile } = useAuth();
   const navigate = useNavigate();
   const t = useTranslation();
+  const [editing, setEditing] = useState(false);
+  const [nameInput, setNameInput] = useState(user?.name || '');
+  const [addressInput, setAddressInput] = useState(user?.address || '');
+  const [pincodeInput, setPincodeInput] = useState(user?.pincode || '');
+  const [cityInput, setCityInput] = useState(user?.city || '');
+  const [stateInput, setStateInput] = useState(user?.state || '');
+  const [saving, setSaving] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const handleSaveProfile = async () => {
+    if (!user) return;
+    try {
+      setSaving(true);
+      const baseAddress = addressInput.trim();
+      const cityPart = cityInput.trim();
+      const fullAddress =
+        cityPart && baseAddress && !baseAddress.toLowerCase().includes(cityPart.toLowerCase())
+          ? `${baseAddress}, ${cityPart}`
+          : baseAddress || user.address;
+      await updateProfile({
+        name: nameInput.trim() || user.name,
+        address: fullAddress || undefined,
+        pincode: pincodeInput.trim() || undefined,
+        city: cityInput.trim() || undefined,
+        state: stateInput.trim() || undefined,
+      });
+      setEditing(false);
+    } catch (error) {
+      // log only; UI stays simple
+      console.error('Failed to update profile:', error);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const languageLabels = {
@@ -63,61 +79,142 @@ export default function CustomerProfile() {
           </p>
         </div>
 
-        {/* Profile Card */}
+        {/* Profile Card + Basic Info Edit */}
         <Card className="card-shadow">
-          <CardContent className="p-6">
+          <CardContent className="p-6 space-y-4">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-full water-gradient flex items-center justify-center text-2xl font-bold text-primary-foreground">
                 {user?.name?.charAt(0) || 'U'}
               </div>
               <div className="flex-1">
-                <h2 className="text-xl font-bold">{user?.name || 'User'}</h2>
-                <p className="text-muted-foreground">+91 {user?.phone}</p>
+                {editing ? (
+                  <div className="space-y-2">
+                    <div>
+                      <Label htmlFor="name">Full Name</Label>
+                      <Input
+                        id="name"
+                        value={nameInput}
+                        onChange={(e) => setNameInput(e.target.value)}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Phone: +91 {user?.phone}
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <h2 className="text-xl font-bold">{user?.name || 'User'}</h2>
+                    <p className="text-muted-foreground">+91 {user?.phone}</p>
+                  </>
+                )}
               </div>
-              <Button variant="ghost" size="icon">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  setEditing((prev) => !prev);
+                  setNameInput(user?.name || '');
+                  setAddressInput(user?.address || '');
+                  setPincodeInput(user?.pincode || '');
+                  setStateInput(user?.state || '');
+                }}
+              >
                 <Edit className="h-4 w-4" />
               </Button>
             </div>
+
+            {/* Address fields when editing */}
+            {editing && (
+              <div className="grid gap-3">
+                <div>
+                  <Label htmlFor="address">Address</Label>
+                  <Input
+                    id="address"
+                    value={addressInput}
+                    onChange={(e) => setAddressInput(e.target.value)}
+                    placeholder="House / Flat, Street, Area"
+                  />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <Label htmlFor="city">City</Label>
+                    <Input
+                      id="city"
+                      value={cityInput}
+                      onChange={(e) => setCityInput(e.target.value)}
+                      placeholder="e.g. Kolhapur"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="state">State</Label>
+                    <Input
+                      id="state"
+                      value={stateInput}
+                      onChange={(e) => setStateInput(e.target.value)}
+                      placeholder="e.g. Maharashtra"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="pincode">Pincode</Label>
+                    <Input
+                      id="pincode"
+                      value={pincodeInput}
+                      onChange={(e) => setPincodeInput(e.target.value)}
+                      placeholder="e.g. 400001"
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-end gap-2 pt-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setEditing(false)}
+                    disabled={saving}
+                  >
+                    Cancel
+                  </Button>
+                  <Button size="sm" onClick={handleSaveProfile} disabled={saving}>
+                    {saving ? 'Saving...' : 'Save'}
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* Saved Addresses */}
+        {/* Saved Address (read-only from profile) */}
         <Card className="card-shadow">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <MapPin className="h-5 w-5 text-primary" />
-              Saved Addresses
+              {t('address')}
             </CardTitle>
-            <Button variant="ghost" size="sm" className="gap-1">
-              <Plus className="h-4 w-4" />
-              Add
-            </Button>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {addresses.map((addr) => (
-              <div
-                key={addr.id}
-                className="flex items-start justify-between p-4 rounded-lg bg-muted/50"
-              >
-                <div className="flex items-start gap-3">
-                  <MapPin className="h-4 w-4 text-primary mt-1" />
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{addr.label}</span>
-                      {addr.isDefault && (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-                          Default
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-1">{addr.address}</p>
-                  </div>
-                </div>
-                <Button variant="ghost" size="icon">
-                  <Edit className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
+          <CardContent className="space-y-2">
+            {user?.address ? (
+              <>
+                <p className="text-sm text-muted-foreground">{user.address}</p>
+                <p className="text-sm text-muted-foreground">
+                  {user.city && <>{user.city}</>}
+                  {user.state && (
+                    <>
+                      {user.city ? ', ' : ''}
+                      {user.state}
+                    </>
+                  )}
+                  {user.pincode && (
+                    <>
+                      {(user.city || user.state) ? ', ' : ''}
+                      {user.pincode}
+                    </>
+                  )}
+                </p>
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No address saved yet. Click the edit icon above to add your address.
+              </p>
+            )}
           </CardContent>
         </Card>
 
@@ -137,41 +234,18 @@ export default function CustomerProfile() {
           </CardContent>
         </Card>
 
-        {/* Payment Methods */}
+        {/* Payment Methods (placeholder, non-editable) */}
         <Card className="card-shadow">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <CreditCard className="h-5 w-5 text-primary" />
               Payment Methods
             </CardTitle>
-            <Button variant="ghost" size="sm" className="gap-1">
-              <Plus className="h-4 w-4" />
-              Add
-            </Button>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {paymentMethods.map((method) => (
-              <div
-                key={method.id}
-                className="flex items-center justify-between p-4 rounded-lg bg-muted/50"
-              >
-                <div className="flex items-center gap-3">
-                  <CreditCard className="h-4 w-4 text-primary" />
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{method.type}</span>
-                      {method.isDefault && (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-                          Default
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-sm text-muted-foreground">{method.details}</p>
-                  </div>
-                </div>
-                <ChevronRight className="h-5 w-5 text-muted-foreground" />
-              </div>
-            ))}
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              Payment methods management will be available in a future update.
+            </p>
           </CardContent>
         </Card>
 

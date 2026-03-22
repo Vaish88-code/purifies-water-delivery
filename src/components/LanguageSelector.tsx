@@ -12,6 +12,7 @@ const languages: { code: Language; name: string; nativeName: string }[] = [
   { code: 'en', name: 'English', nativeName: 'English' },
   { code: 'hi', name: 'Hindi', nativeName: 'हिंदी' },
   { code: 'mr', name: 'Marathi', nativeName: 'मराठी' },
+  { code: 'kn', name: 'Kannada', nativeName: 'ಕನ್ನಡ' },
 ];
 
 export function LanguageSelector() {

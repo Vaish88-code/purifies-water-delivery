@@ -8,6 +8,8 @@ import {
   User,
   LogOut,
   Menu,
+  Settings,
+  Users,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/Logo';
@@ -31,10 +33,13 @@ interface VendorLayoutProps {
 }
 
 const navItems = [
-  { path: '/vendor', icon: Home, label: 'Dashboard' },
-  { path: '/vendor/orders', icon: Package, label: 'Orders' },
-  { path: '/vendor/inventory', icon: Warehouse, label: 'Inventory' },
-  { path: '/vendor/earnings', icon: IndianRupee, label: 'Earnings' },
+  { path: '/vendor', icon: Home, labelKey: 'dashboard' as const },
+  { path: '/vendor/orders', icon: Package, labelKey: 'orders' as const },
+  { path: '/vendor/subscription-requests', icon: Users, labelKey: 'subscriptionRequests' as const },
+  { path: '/vendor/subscriptions', icon: Package, labelKey: 'subscriptions' as const },
+  { path: '/vendor/inventory', icon: Warehouse, labelKey: 'stock' as const },
+  { path: '/vendor/settings', icon: Settings, labelKey: 'shopSettings' as const },
+  { path: '/vendor/earnings', icon: IndianRupee, labelKey: 'earnings' as const },
 ];
 
 export function VendorLayout({ children }: VendorLayoutProps) {
@@ -65,7 +70,7 @@ export function VendorLayout({ children }: VendorLayoutProps) {
               <SheetContent side="left" className="w-72">
                 <div className="mb-6">
                   <Logo />
-                  <span className="text-xs text-muted-foreground ml-2">Vendor Portal</span>
+                  <span className="text-xs text-muted-foreground ml-2">{t('vendorPortal')}</span>
                 </div>
                 <nav className="space-y-2">
                   {navItems.map((item) => (
@@ -80,7 +85,7 @@ export function VendorLayout({ children }: VendorLayoutProps) {
                       }`}
                     >
                       <item.icon className="h-5 w-5" />
-                      <span className="font-medium">{item.label}</span>
+                      <span className="font-medium">{t(item.labelKey)}</span>
                     </Link>
                   ))}
                 </nav>
@@ -97,7 +102,7 @@ export function VendorLayout({ children }: VendorLayoutProps) {
               <Logo size="sm" showText={false} />
             </Link>
             <span className="hidden sm:inline text-xs px-2 py-1 rounded-full bg-secondary/10 text-secondary font-medium">
-              Vendor
+              {t('vendors')}
             </span>
           </div>
 
@@ -114,7 +119,7 @@ export function VendorLayout({ children }: VendorLayoutProps) {
                 }`}
               >
                 <item.icon className="h-4 w-4" />
-                <span className="text-sm font-medium">{item.label}</span>
+                <span className="text-sm font-medium">{t(item.labelKey)}</span>
               </Link>
             ))}
           </nav>
@@ -136,7 +141,7 @@ export function VendorLayout({ children }: VendorLayoutProps) {
               <DropdownMenuContent align="end" className="w-48">
                 <div className="px-2 py-1.5">
                   <p className="font-medium">{user?.name}</p>
-                  <p className="text-sm text-muted-foreground">Vendor Account</p>
+                  <p className="text-sm text-muted-foreground">{t('vendorAccount')}</p>
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="text-destructive">

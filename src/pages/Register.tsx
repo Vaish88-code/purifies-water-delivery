@@ -14,11 +14,17 @@ import {
 } from '@/components/ui/select';
 import { Logo } from '@/components/Logo';
 import { LanguageSelector } from '@/components/LanguageSelector';
-import { useAuth, useTranslation, Language } from '@/contexts/AuthContext';
+import { useAuth, useTranslation, Language, UserRole } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
 export default function Register() {
+  const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+  const [pincode, setPincode] = useState('');
+  const [state, setState] = useState('');
+  const [selectedRole, setSelectedRole] = useState<UserRole>('customer');
+  const [shopName, setShopName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [selectedLanguage, setSelectedLanguage] = useState<Language>('en');
@@ -33,10 +39,78 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!fullName.trim()) {
+      toast({
+        title: 'Name is required',
+        description: 'Please enter your full name',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     if (phone.length !== 10) {
       toast({
         title: 'Invalid phone number',
         description: 'Please enter a valid 10-digit phone number',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Vendor-specific validations
+    if (selectedRole === 'vendor') {
+      if (!shopName.trim()) {
+        toast({
+          title: 'Shop name is required',
+          description: 'Please enter your shop name',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      if (!address.trim()) {
+        toast({
+          title: 'Address is required',
+          description: 'Please enter your shop address',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      if (!state.trim()) {
+        toast({
+          title: 'State is required',
+          description: 'Please enter your state',
+          variant: 'destructive',
+        });
+        return;
+      }
+    } else {
+      // For non-vendors, address and state are also required
+      if (!address.trim()) {
+        toast({
+          title: 'Address is required',
+          description: 'Please enter your full delivery address',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      if (!state.trim()) {
+        toast({
+          title: 'State is required',
+          description: 'Please enter your state',
+          variant: 'destructive',
+        });
+        return;
+      }
+    }
+
+    const cleanedPincode = pincode.replace(/\D/g, '');
+    if (cleanedPincode.length !== 6) {
+      toast({
+        title: 'Invalid pincode',
+        description: 'Please enter a valid 6-digit pincode',
         variant: 'destructive',
       });
       return;
@@ -61,19 +135,49 @@ export default function Register() {
     }
 
     setIsLoading(true);
-    const result = await register(phone, password, selectedLanguage);
-    setIsLoading(false);
+    try {
+      const result = await register(
+        phone,
+        password,
+        selectedLanguage,
+        fullName.trim(),
+        selectedRole,
+        address.trim(),
+        cleanedPincode,
+        state.trim(),
+        selectedRole === 'vendor' ? shopName.trim() : undefined
+      );
+      setIsLoading(false);
 
-    if (result.success) {
+      if (result.success) {
+        toast({
+          title: 'Registration successful!',
+          description: result.error || 'Welcome to Purifies!',
+          variant: result.error ? 'default' : 'default',
+        });
+        // Small delay to ensure user state is updated
+        setTimeout(() => {
+          const routes: Record<UserRole, string> = {
+            customer: '/customer',
+            vendor: '/vendor',
+            delivery: '/delivery',
+            admin: '/admin',
+          };
+          navigate(routes[selectedRole] || '/customer');
+        }, 500);
+      } else {
+        toast({
+          title: 'Registration failed',
+          description: result.error || 'Please try again. Check your internet connection and Firebase configuration.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error: any) {
+      setIsLoading(false);
+      console.error('Registration error:', error);
       toast({
-        title: 'Registration successful!',
-        description: 'Welcome to Purifies!',
-      });
-      navigate('/customer');
-    } else {
-      toast({
-        title: 'Registration failed',
-        description: 'Please try again',
+        title: 'Registration error',
+        description: error.message || 'An unexpected error occurred. Please try again.',
         variant: 'destructive',
       });
     }
@@ -100,6 +204,18 @@ export default function Register() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Full Name */}
+              <div className="space-y-2">
+                <Label htmlFor="fullName">Full Name</Label>
+                <Input
+                  id="fullName"
+                  type="text"
+                  placeholder="Enter your full name"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                />
+              </div>
+
               {/* Phone Number */}
               <div className="space-y-2">
                 <Label htmlFor="phone">{t('phone')}</Label>
@@ -118,6 +234,86 @@ export default function Register() {
                     maxLength={10}
                   />
                 </div>
+              </div>
+
+              {/* Category / Role Selection */}
+              <div className="space-y-2">
+                <Label htmlFor="role">Category</Label>
+                <Select
+                  value={selectedRole}
+                  onValueChange={(value) => {
+                    setSelectedRole(value as UserRole);
+                    // Clear shop name when changing from vendor
+                    if (value !== 'vendor') {
+                      setShopName('');
+                    }
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="customer">Customer</SelectItem>
+                    <SelectItem value="vendor">Vendor</SelectItem>
+                    <SelectItem value="delivery">Delivery Partner</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Shop Name - Only for Vendors */}
+              {selectedRole === 'vendor' && (
+                <div className="space-y-2">
+                  <Label htmlFor="shopName">Shop Name *</Label>
+                  <Input
+                    id="shopName"
+                    type="text"
+                    placeholder="Enter your shop name"
+                    value={shopName}
+                    onChange={(e) => setShopName(e.target.value)}
+                  />
+                </div>
+              )}
+
+              {/* Address */}
+              <div className="space-y-2">
+                <Label htmlFor="address">
+                  {selectedRole === 'vendor' ? 'Shop Address *' : 'Address *'}
+                </Label>
+                <Input
+                  id="address"
+                  type="text"
+                  placeholder={selectedRole === 'vendor' ? 'Shop address' : 'House / Flat, Street, Area, City'}
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                />
+              </div>
+
+              {/* State */}
+              <div className="space-y-2">
+                <Label htmlFor="state">State *</Label>
+                <Input
+                  id="state"
+                  type="text"
+                  placeholder="Enter your state"
+                  value={state}
+                  onChange={(e) => setState(e.target.value)}
+                />
+              </div>
+
+              {/* Pincode */}
+              <div className="space-y-2">
+                <Label htmlFor="pincode">Pincode</Label>
+                <Input
+                  id="pincode"
+                  type="tel"
+                  placeholder="6-digit pincode"
+                  value={pincode}
+                  onChange={(e) =>
+                    setPincode(e.target.value.replace(/\D/g, '').slice(0, 6))
+                  }
+                  maxLength={6}
+                />
               </div>
 
               {/* Password */}
@@ -182,6 +378,7 @@ export default function Register() {
                     <SelectItem value="en">English</SelectItem>
                     <SelectItem value="hi">हिंदी (Hindi)</SelectItem>
                     <SelectItem value="mr">मराठी (Marathi)</SelectItem>
+                    <SelectItem value="kn">ಕನ್ನಡ (Kannada)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

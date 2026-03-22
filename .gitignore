@@ -12,6 +12,18 @@ dist
 dist-ssr
 *.local
 
+# Environment (never commit secrets)
+.env
+.env.*
+!.env.example
+
+# Netlify local CLI state
+.netlify
+
+# Firebase
+.firebase
+*-debug.log
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

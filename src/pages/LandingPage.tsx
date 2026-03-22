@@ -119,26 +119,26 @@ const LandingPage = () => {
         </div>
       </motion.nav>
 
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-20 md:pt-40 md:pb-32 overflow-hidden min-h-[70vh]">
-        {/* Background Image Slider */}
+      {/* Hero Section - full viewport below navbar, image covers entire area */}
+      <section className="relative mt-16 pt-12 pb-20 md:pt-20 md:pb-32 overflow-hidden min-h-[calc(100vh-4rem)]">
+        {/* Background Image Slider - object-cover fills hero, no gaps on sides */}
         <div className="absolute inset-0 overflow-hidden">
           {heroImages.map((src, index) => (
             <motion.img
               key={src}
               src={src}
               alt="Purifies water delivery visual"
-              className="absolute inset-0 h-full w-full object-cover"
-              initial={{ opacity: 0, scale: 1.05 }}
+              className="absolute inset-0 h-full w-full object-cover object-center"
+              initial={{ opacity: 0, scale: 1.02 }}
               animate={{
                 opacity: currentHeroImage === index ? 1 : 0,
-                scale: currentHeroImage === index ? 1 : 1.05,
+                scale: currentHeroImage === index ? 1 : 1.02,
               }}
               transition={{ duration: 1.2, ease: "easeInOut" }}
             />
           ))}
           {/* Dark overlay for strong image contrast and text readability */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/60 to-black/40" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/60 to-black/40 pointer-events-none" />
         </div>
 
         <div className="container mx-auto px-4 relative z-10">

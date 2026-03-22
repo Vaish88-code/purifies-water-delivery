@@ -1,18 +1,22 @@
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  ShoppingCart, 
-  Package, 
-  History, 
+import {
+  ShoppingCart,
+  Package,
+  History,
   MapPin,
-  TrendingUp,
   Droplets,
   Clock,
   ChevronRight,
+  AlertTriangle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CustomerLayout } from '@/components/layouts/CustomerLayout';
 import { useAuth, useTranslation } from '@/contexts/AuthContext';
+import { LocationPermissionModal } from '@/components/location/LocationPermissionModal';
+import { updateUserLocationWithPermission } from '@/lib/firebase/firestore';
+import type { PermissionOutcome } from '@/components/location/LocationPermissionModal';
 
 // Mock data
 const recentOrders = [
@@ -33,13 +37,107 @@ const stats = {
   monthlySavings: 450,
 };
 
+const GEOLOCATION_OPTIONS: PositionOptions = {
+  enableHighAccuracy: true,
+  timeout: 10000,
+  maximumAge: 0,
+};
+
+const SESSION_STORAGE_KEY_LOCATION_MODAL_SHOWN = 'purifies_location_modal_responded';
+
+function hasRespondedToLocationModalThisSession(): boolean {
+  try {
+    return sessionStorage.getItem(SESSION_STORAGE_KEY_LOCATION_MODAL_SHOWN) === '1';
+  } catch {
+    return false;
+  }
+}
+
 export default function CustomerDashboard() {
   const { user } = useAuth();
   const t = useTranslation();
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [showDeniedMessage, setShowDeniedMessage] = useState(false);
+  const hasCheckedPermission = useRef(false);
+
+  // When customer dashboard loads: show permission modal (then hide only if permission already granted)
+  useEffect(() => {
+    if (user?.role !== 'customer' || !user?.id) return;
+
+    if (!('geolocation' in navigator)) {
+      setShowDeniedMessage(true);
+      return;
+    }
+
+    if (hasRespondedToLocationModalThisSession()) return;
+    if (hasCheckedPermission.current) return;
+
+    hasCheckedPermission.current = true;
+
+    // Show modal immediately so user always sees it; we'll hide if permission already granted
+    setShowLocationModal(true);
+
+    if ('permissions' in navigator) {
+      navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+        if (result.state === 'granted') {
+          setShowLocationModal(false);
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              updateUserLocationWithPermission(
+                user.id,
+                pos.coords.latitude,
+                pos.coords.longitude,
+                true
+              ).catch(() => {});
+            },
+            () => {},
+            GEOLOCATION_OPTIONS
+          );
+        } else if (result.state === 'denied') {
+          setShowLocationModal(false);
+          setShowDeniedMessage(true);
+        }
+        // if 'prompt', keep modal visible (already set above)
+      }).catch(() => {
+        // keep modal visible
+      });
+    }
+  }, [user?.id, user?.role]);
+
+  const handleModalClose = (outcome: PermissionOutcome) => {
+    setShowLocationModal(false);
+    try {
+      sessionStorage.setItem(SESSION_STORAGE_KEY_LOCATION_MODAL_SHOWN, '1');
+    } catch {
+      // ignore
+    }
+    if (outcome === 'denied') {
+      setShowDeniedMessage(true);
+    }
+  };
 
   return (
     <CustomerLayout>
       <div className="space-y-6">
+        {/* Android-style location permission modal - appears automatically when permission is prompt */}
+        <LocationPermissionModal
+          visible={showLocationModal}
+          userId={user?.id}
+          onClose={handleModalClose}
+        />
+
+        {/* Warning when user denied or permission was denied */}
+        {showDeniedMessage && (
+          <Card className="border-amber-500/50 bg-amber-500/10">
+            <CardContent className="p-4 flex items-center gap-3">
+              <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0" />
+              <p className="text-sm text-amber-800 dark:text-amber-200">
+                Location required for delivery tracking.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Welcome Section */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -50,7 +148,7 @@ export default function CustomerDashboard() {
               Fresh water, delivered to your doorstep
             </p>
           </div>
-          <Link to="/customer/order">
+          <Link to="/customer/select-shop">
             <Button size="lg" className="water-gradient text-primary-foreground font-semibold gap-2">
               <Droplets className="h-5 w-5" />
               {t('orderWater')}
@@ -89,7 +187,7 @@ export default function CustomerDashboard() {
 
         {/* Quick Action Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Link to="/customer/order" className="group">
+          <Link to="/customer/select-shop" className="group">
             <Card className="card-shadow hover:card-shadow-hover transition-all duration-300 h-full group-hover:-translate-y-1">
               <CardContent className="p-6 flex flex-col items-center text-center">
                 <div className="p-4 rounded-2xl bg-primary/10 mb-4 group-hover:bg-primary/20 transition-colors">
@@ -205,10 +303,17 @@ export default function CustomerDashboard() {
                   <h3 className="font-semibold">Delivery Address</h3>
                   <Button variant="ghost" size="sm">Change</Button>
                 </div>
-                <p className="text-muted-foreground mt-1">
-                  123, Building Name, Street Name, Area<br />
-                  Mumbai, Maharashtra - 400001
-                </p>
+                {user?.address ? (
+                  <p className="text-muted-foreground mt-1">
+                    {user.address}
+                    {user.state && <><br />{user.state}</>}
+                    {user.pincode && <>, {user.pincode}</>}
+                  </p>
+                ) : (
+                  <p className="text-muted-foreground mt-1">
+                    No address registered. Please update your profile.
+                  </p>
+                )}
               </div>
             </div>
           </CardContent>
